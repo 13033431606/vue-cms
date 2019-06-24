@@ -1,10 +1,10 @@
 <script>
-    const base_url= "http://thy-cms.tt/public";//目标域名
+    const base_url= "http://cms-api.tt/public";//目标域名
 
-    const article_url= base_url+ "/article/getData";//page, limit
+    const article_index= base_url+ "/article/index";//id, page, num
 
     export default {
-        article_url
+        article_index
     }
 </script>
 
