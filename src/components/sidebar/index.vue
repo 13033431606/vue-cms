@@ -4,8 +4,9 @@
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
-            background-color="rgba(0,0,0,0)"
+            background-color="#222"
             text-color="rgba(255,255,255,0.95)"
+            active-text-color="#FF8C00"
             router
     >
         <el-submenu index="article">
@@ -54,11 +55,6 @@
         border-right: none;
         font-weight: lighter;
         font-size: 13px;
-    }
-    .el-menu-item{
-        &:hover{
-            background: #000;
-        }
     }
 
 </style>
