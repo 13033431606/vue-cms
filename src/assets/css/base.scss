@@ -1,0 +1,323 @@
+@charset "utf-8";
+
+//主色调
+$logo_color:#FF8C00;
+$color:#33b3FF;
+$color2: #005af9;
+$color3: #9b78f9;
+$color4: #b0fbfe;
+
+//默认字体
+$font: "SF Pro SC", "HanHei SC", "SF Pro Text", "Myriad Set Pro", "PingFang SC", "Helvetica Neue",'microsoft yahei','Microsoft YaHei',SimHei,sans-serif;
+
+//线性渐变(角度,起始色,终止色,深度,darken|lighten);
+@mixin linear_gradient($deg:-120deg,$rgba:$color,$rgba2:$color,$degree:20%,$tone:"darken"){
+  @if $tone == darken {
+    background: -webkit-linear-gradient($deg, $rgba, darken($rgba2,$degree));
+    background: -o-linear-gradient($deg, $rgba, darken($rgba2,$degree));
+    background: -moz-linear-gradient($deg, $rgba, darken($rgba2,$degree));
+    background: linear-gradient($deg, $rgba, darken($rgba2,$degree));
+  }
+  @else if $tone == lighten{
+    background: -webkit-linear-gradient($deg, $rgba, lighten($rgba2,$degree));
+    background: -o-linear-gradient($deg, $rgba, lighten($rgba2,$degree));
+    background: -moz-linear-gradient($deg, $rgba, lighten($rgba2,$degree));
+    background: linear-gradient($deg, $rgba, lighten($rgba2,$degree));
+  }
+}
+//设置字体尺寸,颜色(size,color);
+@mixin font($value,$value2){
+  font-family: $font;
+  font-size: $value;
+  color:$value2;
+}
+//水平居中
+@mixin horizontal{
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+//垂直居中
+@mixin vertical{
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+}
+//居中
+@mixin center{
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+//阴影
+@mixin box-shadow($value){
+  -webkit-box-shadow: $value;
+  box-shadow: $value;
+}
+//过渡(时间,动画方式)
+@mixin transition($value:0.2s,$value2:ease){
+  transition: $value;
+  -moz-transition: $value;
+  -webkit-transition: $value;
+  -o-transition: $value;
+  transition-timing-function: $value2;
+  -moz-transition-timing-function: $value2; /* Firefox 4 */
+  -webkit-transition-timing-function: $value2; /* Safari 和 Chrome */
+  -o-transition-timing-function: $value2; /* Opera */
+}
+//transform
+@mixin transform($value){
+  transform: $value;
+  -ms-transform:$value;
+  -moz-transform: $value;
+  -webkit-transform: $value;
+  -o-transform: $value;
+}
+@mixin Y($value){
+  transform:translateY($value);
+  -ms-transform:translateY($value);
+  -moz-transform:translateY($value);
+  -webkit-transform:translateY($value);
+  -o-transform:translateY($value);
+}
+@mixin X($value){
+  transform:translateX($value);
+  -ms-transform:translateX($value);
+  -moz-transform:translateX($value);
+  -webkit-transform:translateX($value);
+  -o-transform:translateX($value);
+}
+@mixin scale($value){
+  transform:scale($value);
+  -ms-transform:scale($value);
+  -moz-transform:scale($value);
+  -webkit-transform:scale($value);
+  -o-transform:scale($value);
+}
+@mixin rotate($value){
+  transform:rotate($value);
+  -ms-transform:rotate($value);
+  -moz-transform:rotate($value);
+  -webkit-transform:rotate($value);
+  -o-transform:rotate($value);
+}
+@mixin rotate3d($val1:1,$val2:1,$val3:1,$value:360deg){
+  transform:rotate3d($val1, $val2, $val3, $value);
+  -ms-transform:rotate3d($val1, $val2, $val3, $value);
+  -moz-transform:rotate3d($val1, $val2, $val3, $value);
+  -webkit-transform:rotate3d($val1, $val2, $val3, $value);
+  -o-transform:rotate3d($val1, $val2, $val3, $value);
+}
+//动画方式
+@mixin animate-way($value2:ease){
+  transition-timing-function: $value2;
+  -moz-transition-timing-function: $value2; /* Firefox 4 */
+  -webkit-transition-timing-function: $value2; /* Safari 和 Chrome */
+  -o-transition-timing-function: $value2; /* Opera */
+}
+//清除浮动引发的bug
+@mixin clear{
+  *zoom: 1;
+  &:before, &:after {
+    content: " ";
+    display: table;
+  }
+  &:after {
+    clear: both;
+  }
+}
+//宽高,disblock
+@mixin a{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+@mixin input($value,$value2,$value3:"normal"){
+  input::-webkit-input-placeholder {
+    font-size: $value;
+    color: $value2;
+    font-weight: $value3;
+  }
+  input:-moz-placeholder {
+    font-size: $value;
+    color: $value2;
+    font-weight: $value3;
+  }
+  input::-moz-placeholder {
+    font-size: $value;
+    color: $value2;
+    font-weight: $value3;
+  }
+  input:-ms-input-placeholder {
+    font-size: $value;
+    color: $value2;
+    font-weight: $value3;
+  }
+}
+@mixin textarea($value,$value2,$value3:"normal"){
+  textarea::-webkit-input-placeholder {
+    font-size: $value;
+    color: $value2;
+    font-weight: $value3;
+  }
+  textarea:-moz-placeholder {
+    font-size: $value;
+    color: $value2;
+    font-weight: $value3;
+  }
+  textarea::-moz-placeholder {
+    font-size: $value;
+    color: $value2;
+    font-weight: $value3;
+  }
+  textarea:-ms-input-placeholder {
+    font-size: $value;
+    color: $value2;
+    font-weight: $value3;
+  }
+}
+//三角
+@mixin arrow($direction,$size,$color) {
+  width: 0;
+  height: 0;
+  line-height: 0;
+  font-size: 0;
+  overflow: hidden;
+  border-width: $size;
+  cursor: pointer;
+  @if $direction == top {
+    border-style: dashed dashed solid dashed;
+    border-color: transparent transparent $color transparent;
+    border-top: none;
+  }
+  @else if $direction == bottom {
+    border-style: solid dashed dashed dashed;
+    border-color: $color transparent transparent transparent;
+    border-bottom: none;
+  }
+  @else if $direction == right {
+    border-style: dashed dashed dashed solid;
+    border-color: transparent transparent transparent $color;
+    border-right: none;
+  }
+  @else if $direction == left {
+    border-style: dashed solid dashed dashed;
+    border-color: transparent $color transparent transparent;
+    border-left: none;
+  }
+}
+@mixin fit($value:cover){
+  -o-object-fit: $value;
+  object-fit: $value;
+  -o-object-position: center;
+  object-position: center;
+  width: 100%;
+  height:100%;
+}
+//超出内容省略号
+@mixin elli{
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+@mixin box-sizing($value:border-box){
+  box-sizing:$value;
+  -moz-box-sizing:$value; /* Firefox */
+  -webkit-box-sizing:$value; /* Safari*/
+}
+//平移动画,兄弟元素需加zindex
+@mixin button($bac:$color,$direction:left){
+  position: relative;
+  overflow: hidden;
+  &:after{
+    content: '';
+    background: $bac;
+    opacity: 0;
+    @include transition(0.5s);
+    @include a;
+    position: absolute;
+    @if $direction == top {
+      left:0;
+      top: 100%;
+    }
+    @if $direction == right {
+      left: 100%;
+      top: 0;
+    }
+    @if $direction == bottom {
+      left:0;
+      top: -100%;
+    }
+    @if $direction == left {
+      left: -100%;
+      top: 0;
+    }
+  }
+  &:hover{
+    &:after{
+      @if $direction == top {
+        top: 0;
+        opacity: 1;
+      }
+      @if $direction == right {
+        left:0;
+        opacity: 1;
+      }
+      @if $direction == bottom {
+        top: 0;
+        opacity: 1;
+      }
+      @if $direction == left {
+        left: 0;
+        opacity: 1;
+      }
+
+    }
+  }
+}
+//文字排列方式
+@mixin write{
+  -webkit-writing-mode: vertical-rl;
+  -moz-writing-mode: vertical-rl;
+  -o-writing-mode: vertical-rl;
+  -ms-writing-mode: tb-rl;
+  writing-mode: vertical-rl;
+}
+
+/*自写组件部分*/
+main
+{
+  max-width: 90%;
+  margin: 0 auto;
+  display: block;
+  @include clear;
+}
+html{
+  background: #fff;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/*动画区域*/
+.fade-enter{
+  @include X(50%);
+  opacity: 0;
+}
+.fade-enter-active{
+  @include transition(0.5s);
+}
+
+.fade-leave-active{
+  @include transition(0.5s);
+}
+.fade-leave-to{
+  @include Y(50px);
+  opacity: 0;
+}
+
+
