@@ -1,6 +1,6 @@
 <template>
     <div class="article_edit inner_container">
-        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form ref="form" :model="form"  label-width="80px">
 
             <!--标题-->
             <el-form-item label="标题" prop="title">
@@ -27,8 +27,8 @@
                 >
                     <i class="el-icon-plus"></i>
                 </el-upload>
-                <el-dialog :visible.sync="dialogVisible">
-                    <img width="100%" :src="dialogImageUrl" alt="">
+                <el-dialog :visible.sync="dialog_visible">
+                    <img width="100%" :src="dialog_imageUrl" alt="Theory by thy">
                 </el-dialog>
             </el-form-item>
 
@@ -114,7 +114,7 @@
 
     import api from "@/components/api";
     const article_add=api.article_add;
-
+    const temp_path=api.temp_path;
     const file_upload=api.file_upload;
     const type_tree=api.type_tree;
 
@@ -156,8 +156,8 @@
                     ]
                 },
                 //上传组件
-                dialogImageUrl: '',
-                dialogVisible: false,
+                dialog_imageUrl: '',
+                dialog_visible: false,
                 //上传路径
                 file_upload:file_upload,
                 //分类数据
@@ -254,8 +254,8 @@
                     imagetools_toolbar: "rotateleft rotateright | flipv fliph | editimage imageoptions",//图片工具
 
                     //匹配图片上传路径
-                    images_upload_url: this.file_upload,
-                    images_upload_base_path: '/public/uploads/',//前缀路径
+                    images_upload_url: file_upload,
+                    images_upload_base_path: temp_path,//前缀路径
                     automatic_uploads:true,
                     relative_urls : false,
                     remove_script_host : true,
@@ -318,8 +318,7 @@
 
             //分类pid
             cat_change(value) {
-                this.form.pid=value.splice(value.length-1,1);
-                console.log(this.pid_arr)
+                this.form.pid=value.splice(value.length-1,1)[0];
             },
 
             order_change(value){
@@ -329,15 +328,17 @@
             //提交表单
             submit_form(formName) {
                 var that=this;
-                console.log(that.form)
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         that.$axios({
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
                             url:article_add,
-                            method: 'post',
+                            method:'post',
                             data:qs.stringify(that.form)
                         }).then(res=>{
-                            console.log(res);
+                            console.log(res.data);
                         })
                     } else {
                         console.log('验证错误');
