@@ -8,7 +8,7 @@
                         type="text"
                         placeholder="请输入内容..."
                         v-model="form.title"
-                        maxlength="10"
+                        maxlength="200"
                         show-word-limit
                 ></el-input>
             </el-form-item>
@@ -16,10 +16,14 @@
             <!--上传-->
             <el-form-item label="图片" prop="img">
                 <el-upload
-                        action="https://jsonplaceholder.typicode.com/posts/"
+                        :action="file_upload"
                         list-type="picture-card"
-                        :on-preview="handlePictureCardPreview"
-                        :on-remove="handleRemove"
+                        :on-preview="upload_preview"
+                        :on-remove="upload_remove"
+                        :on-success="upload_success"
+                        :on-error="upload_error"
+                        :limit="6"
+                        :on-exceed="upload_exceed"
                 >
                     <i class="el-icon-plus"></i>
                 </el-upload>
@@ -31,11 +35,28 @@
             <!--分类-->
             <el-form-item label="分类" prop="pid">
                 <el-cascader
+                        :show-all-levels="false"
                         placeholder="请选择文章分类"
                         v-model="form.pid"
                         :options="options"
-                        :props="{ expandTrigger: 'hover' }"
-                        @change="catChange"></el-cascader>
+                        v-loading="tree_loading"
+                        :props="{
+                            expandTrigger: 'hover' ,
+                            label: 'name',
+                            value: 'id',
+                            children: 'son'
+                        }"
+                        @change="cat_change"></el-cascader>
+            </el-form-item>
+
+            <!--日期-->
+            <el-form-item label="日期" prop="time">
+                <el-date-picker
+                        v-model="form.time"
+                        type="date"
+                        :value-format="time_type"
+                        placeholder="选择日期">
+                </el-date-picker>
             </el-form-item>
 
             <!--关键词-->
@@ -44,7 +65,7 @@
                         type="text"
                         placeholder="请输入内容..."
                         v-model="form.keywords"
-                        maxlength="10"
+                        maxlength="150"
                         show-word-limit
                 ></el-input>
             </el-form-item>
@@ -55,31 +76,31 @@
                         type="text"
                         placeholder="请输入内容..."
                         v-model="form.description"
-                        maxlength="10"
+                        maxlength="350"
                         show-word-limit
                 ></el-input>
             </el-form-item>
 
             <!--内容-->
             <el-form-item label="内容" prop="content">
-                <Editor api-key="w2tyn2nq7v7yo8gq1qx7rs8pif7w1tbck1ff2y5nb7fv6l59" :init="all_option"></Editor>
+                <editor api-key="w2tyn2nq7v7yo8gq1qx7rs8pif7w1tbck1ff2y5nb7fv6l59" v-model="form.content" :init="all_option"></editor>
             </el-form-item>
 
             <!--排序-->
             <el-form-item label="排序" prop="order">
-                <el-input-number v-model="order" controls-position="right" @change="orderChange" :min="1" :max="999"></el-input-number>
+                <el-input-number v-model="form.order" controls-position="right" @change="order_change" :min="1" :max="999"></el-input-number>
             </el-form-item>
 
             <!--状态-->
             <el-form-item label="状态" prop="state">
-                <el-radio v-model="radio" label="1">显示</el-radio>
-                <el-radio v-model="radio" label="2">隐藏</el-radio>
+                <el-radio v-model="form.state" label="on">显示</el-radio>
+                <el-radio v-model="form.state" label="off">隐藏</el-radio>
             </el-form-item>
 
             <!--提交-->
             <el-form-item>
-                <el-button type="primary" @click="onSubmit">创建</el-button>
-                <el-button>取消</el-button>
+                <el-button type="primary" @click="submit_form('form')">立即创建</el-button>
+                <el-button @click="reset_form('form')">重置</el-button>
             </el-form-item>
 
 
@@ -89,44 +110,60 @@
 </template>
 
 <script>
+    import qs from 'qs';
+
+    import api from "@/components/api";
+    const article_add=api.article_add;
+
+    const file_upload=api.file_upload;
+    const type_tree=api.type_tree;
+
+
 
     export default {
         components:{
-          "Editor":()=>import("@tinymce/tinymce-vue"),
+          "editor":()=>import("@tinymce/tinymce-vue"),
+        },
+        created(){
+            this.type_tree(1);
         },
         data() {
             return {
+                tree_loading:true,
                 //表单相关
                 form: {
                     title: '',
-                    pid:'',
                     img:'',
+                    pid:'',
+                    time:'',
                     keywords: '',
                     description: '',
                     content: '',
                     order:'',
-                    state:''
+                    state:'on'
                 },
+                img_arr:[],
                 //表单验证
                 rules: {
                     title: [
                         { required: true, message: '请输入文章标题', trigger: 'blur' },
-                        { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
                     ],
                     pid: [
-                        { required: true, message: '请选择文章分类', trigger: 'change' }
+                        { required: true, message: '请选择文章分类', trigger: 'blur' }
+                    ],
+                    time: [
+                        { required: true, message: '请选择日期', trigger: 'blur' }
                     ]
                 },
                 //上传组件
                 dialogImageUrl: '',
                 dialogVisible: false,
+                //上传路径
+                file_upload:file_upload,
                 //分类数据
-                options:[
-                    {
-                        value: 'zhinan',
-                        label: '指南',
-                    }
-                ],
+                options:[],
+                //日期格式
+                time_type:'yyyy-MM-dd',
                 order:"1",
                 //文章状态
                 radio:"1",
@@ -156,9 +193,9 @@
                     //'linkchecker ' +//链接验证,需配置,暂未使用//https://www.tiny.cloud/docs/plugins/linkchecker/
                     'lists ' +//列表样式
                     'media ' +//多媒体
-                    'nonbreaking ' +//不间断空格
+                    // 'nonbreaking ' +//不间断空格
                     //'noneditable ' +//纺织用户更改元素内容,适合模板使用
-                    'pagebreak ' +//分页符
+                    // 'pagebreak ' +//分页符
                     'paste ' +//黏贴
                     'preview ' +//预览
                     'print ' +//打印
@@ -166,7 +203,7 @@
                     'searchreplace ' +//查找替换
                     //'spellchecker ' +//拼写检查
                     'table ' +//表格
-                    'template ' +//模板
+                    // 'template ' +//模板
                     'textpattern ' +//转换特殊字符,类似markdown
                     'toc ' +//添加内容列表
                     'visualblocks ' +//显示区域块内容
@@ -191,13 +228,13 @@
                         ,"emoticons"//表情文字
                         ,"fullpage"//编辑文档属性，如标题、关键字和说明
                         ,"insertdatetime"//时间选择工具//https://www.tiny.cloud/docs/plugins/insertdatetime/
-                        ,"nonbreaking"//不间断空格
-                        ,"pagebreak"//分页符
+                        // ,"nonbreaking"//不间断空格
+                        // ,"pagebreak"//分页符
                         ,"paste"//黏贴
                         ,"searchreplace"//查找替换
                         //,"spellchecker"//拼写检查
                         //,"table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol"//表格相关
-                        ,"template"
+                        // ,"template"
                         ,"textpattern"
                         ,"toc"
                         ,"visualblocks"//显示区域块内容
@@ -217,7 +254,7 @@
                     imagetools_toolbar: "rotateleft rotateright | flipv fliph | editimage imageoptions",//图片工具
 
                     //匹配图片上传路径
-                    images_upload_url: '__APP__/tinymce/upLoad',
+                    images_upload_url: this.file_upload,
                     images_upload_base_path: '/public/uploads/',//前缀路径
                     automatic_uploads:true,
                     relative_urls : false,
@@ -244,25 +281,73 @@
             }
         },
         methods: {
+            //获取树状结构
+            type_tree(id){
+                this.tree_loading=true;
+              this.$axios({
+                  url:type_tree,
+                  params:{id:id}
+              }).then(res=>{
+                  this.tree_loading=false;
+                  this.options=res.data.data[0]["son"];
+              })
+            },
+
             //上传组件
-            handleRemove(file, fileList) {
+            upload_remove(file, fileList) {
                 console.log(file, fileList);
             },
-            handlePictureCardPreview(file) {
+            upload_preview(file) {
                 this.dialogImageUrl = file.url;
                 this.dialogVisible = true;
             },
-            //分类
-            catChange(value) {
-                console.log(value);
+            upload_success(response, file, fileList){
+                this.img_arr.push(response.data);
+                this.form.img=this.img_arr.join(",");
+            },
+            upload_error(response, file, fileList){
+                console.log(response);
+            },
+            upload_exceed(){
+                this.$message({
+                    showClose: true,
+                    message: '图片上传超出限制,最多六张!',
+                    type: 'warning'
+                });
             },
 
-            orderChange(value){
-                console.log(value);
+            //分类pid
+            cat_change(value) {
+                this.form.pid=value.splice(value.length-1,1);
+                console.log(this.pid_arr)
             },
+
+            order_change(value){
+
+            },
+
             //提交表单
-            onSubmit() {
-                console.log('submit!');
+            submit_form(formName) {
+                var that=this;
+                console.log(that.form)
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        that.$axios({
+                            url:article_add,
+                            method: 'post',
+                            data:qs.stringify(that.form)
+                        }).then(res=>{
+                            console.log(res);
+                        })
+                    } else {
+                        console.log('验证错误');
+                        return false;
+                    }
+                });
+            },
+            //重置表单
+            reset_form(formName) {
+                this.$refs[formName].resetFields();
             }
         }
     }
