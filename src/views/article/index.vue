@@ -1,13 +1,19 @@
 <template>
     <div class="article_index inner_container">
+        <el-button plain @click="delete_selections">删除选中</el-button>
         <el-table
                 :data="article_data"
+                @selection-change="handle_selection_change"
                 v-loading="loading"
                 style="width: 100%">
             <el-table-column
+                    type="selection"
+                    width="55">
+            </el-table-column>
+            <el-table-column
                     label="Id"
                     prop="id"
-                    width="80">
+                    width="70">
             </el-table-column>
             <el-table-column
                     label="标题"
@@ -21,35 +27,35 @@
             </el-table-column>
             <el-table-column
                     label="排序"
-                    prop="order"
-                    width="80">
+                    prop="sort"
+                    width="70">
             </el-table-column>
             <el-table-column
                     label="添加时间"
                     prop="time"
-                    width="160">
+                    width="100">
             </el-table-column>
             <el-table-column
                     align="right">
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
-                            @click="handleEdit(scope.$index, scope.row)">查看</el-button>
+                            @click="handle_view(scope.$index, scope.row)">查看</el-button>
                     <el-button
                             size="mini"
-                            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                            @click="handle_edit(scope.row.id)">编辑</el-button>
                     <el-button
                             size="mini"
                             type="danger"
-                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                            @click="handle_delete(scope.row.id)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
 
         <div class="page">
             <el-pagination
-                    @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange"
+                    @size-change="handle_size_change"
+                    @current-change="handle_current_change"
                     :current-page="current_page"
                     :page-sizes="[5, 10, 15]"
                     :page-size="page_size"
@@ -64,23 +70,35 @@
     import api from "@/components/api";
 
     const article_index=api.article_index;
+    const article_del=api.article_del;
 
     export default {
         data() {
             return {
                 article_data:[],
                 search: '',
-                page_size:5,
+                page_size:10,
                 current_page:1,
                 typeid:0,
                 total_count:0,
                 loading:true,
+                //删除的id
+                delete_id:"",
             }
         },
         created(){
             this.get_data(this.typeid,this.current_page,this.page_size);
         },
         methods: {
+            //多选框点击
+            handle_selection_change(val) {
+                let ids=val.map(function (value) {
+                    return value.id
+                });
+                this.delete_id=ids.join(",");
+            },
+
+            //获取文章数据
             get_data(id,page,num){
                 this.loading=true;
                 this.$axios({
@@ -96,18 +114,77 @@
                     this.loading=false;
                 })
             },
-            handleEdit(index, row) {
-                console.log(index, row);
+
+            //删除文章方法
+            delete_article(id){
+                this.$axios({
+                    url:article_del,
+                    method:"get",
+                    params:{id:id}
+                }).then((res) => {
+                    //确认删除后更新页面数据
+                    this.get_data(this.typeid,this.current_page,this.page_size);
+
+                    console.log(res)
+                });
             },
-            handleDelete(index, row) {
-                console.log(index, row);
+
+            //表单操作事件
+            handle_view(index, row) {
+
             },
+            handle_edit(id) {
+                this.$router.push({ name: 'article_edit', params: { id: id }})
+            },
+            //处理单id删除的方法
+            handle_delete(id) {
+                this.delete_id=id;
+                this.$confirm('确定删吗?删除的id:'+this.delete_id,'提示',{
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.delete_article(this.delete_id);
+                    this.$message({
+                        type: 'success',
+                        message: '删除成功!'
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+
+            //删除选中的条目
+            delete_selections(){
+                if(this.delete_id != ''){
+                    this.$confirm('确定删吗?删除的id:'+this.delete_id,'提示',{
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.delete_article(this.delete_id);
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });
+                    })
+                }
+            },
+
             //每页数量调整
-            handleSizeChange(val) {
+            handle_size_change(val) {
                 this.page_size=val;
             },
             //当前页码调整
-            handleCurrentChange(val) {
+            handle_current_change(val) {
                 this.current_page=val;
             }
         },

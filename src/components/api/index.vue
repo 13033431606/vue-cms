@@ -1,21 +1,31 @@
 <script>
     const base_url= "http://cms-api.tt/public";//目标域名
 
-    const temp_path= base_url+ "/uploads/temp/";//目标域名
+    //public
+    const temp_path= base_url+ "/uploads/temp/";//缓存路径
+    const formal_path= base_url+ "/uploads/";//正式路径
 
 
     //aritlce
     const article_index= base_url+ "/article/index";//id, page, num
     const article_add= base_url+ "/article/add";//data
+    const article_del= base_url+ "/article/del";//id
+    const get_single_article= base_url+ "/article/get_single_article";//id
 
 
     //base
-    const file_upload= base_url+ "/base/upload";//图片上传 file
+    const file_upload= base_url+ "/base/upload";//文件上传 file
+    const del_file= base_url+ "/base/del_file";//文件删除 file_name
     const type_tree= base_url+ "/base/type_tree";//获取树状结构 id
 
 
     export default {
-        article_index,file_upload,article_add,type_tree,temp_path
+        //public
+        temp_path,formal_path,
+        //article部分
+        article_index,article_del,article_add,get_single_article,
+        //base部分
+        file_upload,type_tree,del_file
     }
 </script>
 

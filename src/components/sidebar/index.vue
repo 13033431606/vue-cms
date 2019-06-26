@@ -16,7 +16,6 @@
             </template>
             <el-menu-item index="/article/index">列表</el-menu-item>
             <el-menu-item index="/article/add">添加</el-menu-item>
-            <el-menu-item index="/article/edit">修改</el-menu-item>
             <el-menu-item index="article_category">分类</el-menu-item>
         </el-submenu>
         <el-submenu index="1">

@@ -9,8 +9,8 @@ export const default_router= [
     { path: "/article", component: layout,
         children: [
             { path: "index", component:() => import("@/views/article") },
-            { path: "edit", component:() => import("@/views/article/edit")},
-            { path: "add", component:() => import("@/views/article/add")},
+            { path: "edit", component:() => import("@/views/article/handle"), name: "article_edit"},
+            { path: "add", component:() => import("@/views/article/handle"), name: "article_add"},
         ]
     },
 ];

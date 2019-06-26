@@ -1,7 +1,6 @@
 <template>
     <div class="article_edit inner_container">
-        <el-form ref="form" :model="form"  label-width="80px">
-
+        <el-form ref="form" :model="form" :rules="rules" label-width="80px" v-loading="form_loading">
             <!--标题-->
             <el-form-item label="标题" prop="title">
                 <el-input
@@ -21,14 +20,14 @@
                         :on-preview="upload_preview"
                         :on-remove="upload_remove"
                         :on-success="upload_success"
-                        :on-error="upload_error"
                         :limit="6"
                         :on-exceed="upload_exceed"
+                        :file-list="img_list"
                 >
                     <i class="el-icon-plus"></i>
                 </el-upload>
                 <el-dialog :visible.sync="dialog_visible">
-                    <img width="100%" :src="dialog_imageUrl" alt="Theory by thy">
+                    <img width="100%" :src="dialog_imageurl" alt="Theory by thy">
                 </el-dialog>
             </el-form-item>
 
@@ -87,8 +86,13 @@
             </el-form-item>
 
             <!--排序-->
-            <el-form-item label="排序" prop="order">
-                <el-input-number v-model="form.order" controls-position="right" @change="order_change" :min="1" :max="999"></el-input-number>
+            <el-form-item label="排序" prop="sort">
+                <el-input-number v-model="form.sort" controls-position="right" @change="sort_change" :min="0" :max="999"></el-input-number>
+            </el-form-item>
+
+            <!--点击量-->
+            <el-form-item label="点击" prop="click">
+                <el-input-number v-model="form.click" controls-position="right" @change="click_change" :min="0" :max="999999"></el-input-number>
             </el-form-item>
 
             <!--状态-->
@@ -99,11 +103,9 @@
 
             <!--提交-->
             <el-form-item>
-                <el-button type="primary" @click="submit_form('form')">立即创建</el-button>
+                <el-button type="primary" :loading="submit_loading" @click="submit_form('form')">立即提交</el-button>
                 <el-button @click="reset_form('form')">重置</el-button>
             </el-form-item>
-
-
         </el-form>
     </div>
 
@@ -111,11 +113,19 @@
 
 <script>
     import qs from 'qs';
-
     import api from "@/components/api";
-    const article_add=api.article_add;
+
+
     const temp_path=api.temp_path;
+    const formal_path=api.formal_path;
+
+
+    const article_add=api.article_add;
+    const get_single_article=api.get_single_article;
+
     const file_upload=api.file_upload;
+    const del_file=api.del_file;
+
     const type_tree=api.type_tree;
 
 
@@ -126,23 +136,32 @@
         },
         created(){
             this.type_tree(1);
+            this.getNowFormatDate();
+            if(this.$route.params.id){
+                this.get_single_article();
+            }
         },
         data() {
             return {
+                //控制loading
                 tree_loading:true,
+                submit_loading:false,
+                form_loading:false,//编辑页面用
                 //表单相关
                 form: {
                     title: '',
-                    img:'',
+                    img:'',//和img_arr,img_list,三者相关联
                     pid:'',
                     time:'',
                     keywords: '',
                     description: '',
                     content: '',
-                    order:'',
-                    state:'on'
+                    sort:'',
+                    state:'on',
+                    click:0,
+                    //如果是编辑的话,会有id值
+                    id:this.$route.params.id?this.$route.params.id:0,
                 },
-                img_arr:[],
                 //表单验证
                 rules: {
                     title: [
@@ -156,8 +175,11 @@
                     ]
                 },
                 //上传组件
-                dialog_imageUrl: '',
-                dialog_visible: false,
+                img_arr:[],//用来缓冲处理图片删除或者添加的中间件数组
+                img_list: [],//供上传组件识别的数组,内为图片对象
+                img_remove: "",//将要移除的图片filename
+                dialog_imageurl: '',//预览图片的路径
+                dialog_visible: false,//预览图片的开关
                 //上传路径
                 file_upload:file_upload,
                 //分类数据
@@ -281,6 +303,34 @@
             }
         },
         methods: {
+            //判断有无传值,有的话获取数据
+            get_single_article(){
+                this.form_loading= true;
+                this.$axios({
+                    url: get_single_article,
+                    method: "get",
+                    params: {id: this.$route.params.id}
+                }).then((res) => {
+                    //处理pid
+                    //element-ui级联组件支持数组值
+                    //pid经上传后序列化成了字符串,所以得转化一下
+                    let pid_arr= [];
+                    pid_arr.push(parseInt(res.data.data.pid));
+                    this.form= res.data.data;
+                    this.form.pid= pid_arr;
+
+                    //处理图片列表
+                    //首先判断不为空
+                    if(res.data.data.img != ''){
+                        this.img_arr= res.data.data.img.split(",");
+                        this.img_list= this.img_arr.map(function (value) {
+                            return {name: "value", url: formal_path+value, data: value}
+                        });
+                    }
+
+                    this.form_loading=false;
+                })
+            },
             //获取树状结构
             type_tree(id){
                 this.tree_loading=true;
@@ -293,20 +343,52 @@
               })
             },
 
-            //上传组件
-            upload_remove(file, fileList) {
-                console.log(file, fileList);
+            //获取当前时间
+            getNowFormatDate() {
+                var date = new Date();
+                var seperator1 = "-";
+                var seperator2 = ":";
+                var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+                var strDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+                var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate;
+                this.form.time=currentdate;
+            },
+
+            //上传组件方法群
+            upload_remove(response) {
+                let that= this;
+                let img_remove= response.response? response.response.data: response.data;
+
+                let qs_filename= qs.stringify({file_name:img_remove});
+                this.$axios({
+                    url: del_file,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    data: qs_filename,
+                    method: "post"
+                }).then((res) => {
+                    let index= that.img_arr.indexOf(img_remove);
+                    that.img_arr.splice(index,1);
+                    //因为不监听splice方法,所以手动改
+                    that.form.img= that.img_arr.join(",")
+                    that.$message({
+                        message: "图片删除成功!",
+                        type: "success"
+                    })
+                }).catch(() => {
+                    that.$message({
+                        message: "图片删除失败!",
+                        type: "error"
+                    })
+                })
             },
             upload_preview(file) {
-                this.dialogImageUrl = file.url;
-                this.dialogVisible = true;
+                this.dialog_imageurl= file.url;
+                this.dialog_visible= true;
             },
-            upload_success(response, file, fileList){
+            upload_success(response){
                 this.img_arr.push(response.data);
-                this.form.img=this.img_arr.join(",");
-            },
-            upload_error(response, file, fileList){
-                console.log(response);
             },
             upload_exceed(){
                 this.$message({
@@ -318,30 +400,79 @@
 
             //分类pid
             cat_change(value) {
-                this.form.pid=value.splice(value.length-1,1)[0];
+                //eleme联级组件返回的是数组,方便维护,取单一父id传值
+                this.form.pid= value.splice(value.length-1,1);
             },
 
-            order_change(value){
+            //排序sort
+            sort_change(value){
+                this.form.sort= value;
+            },
 
+            //点击量click
+            click_change(value){
+                this.form.click= value;
             },
 
             //提交表单
             submit_form(formName) {
+                //开启上传loading开关
+                this.submit_loading= true;
+
                 var that=this;
                 this.$refs[formName].validate((valid) => {
+                    //先通过验证
                     if (valid) {
+                        //因为用post传值,得用qs序列化,并添加header
+                        //更改pid的数据类型
+                        this.form.pid= this.form.pid[0];
+
                         that.$axios({
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             },
-                            url:article_add,
-                            method:'post',
-                            data:qs.stringify(that.form)
+                            url: article_add,
+                            method: 'post',
+                            data: qs.stringify(that.form)
                         }).then(res=>{
-                            console.log(res.data);
+                            if(res){
+                                //返回提示信息
+                                that.$message({
+                                    showClose: true,
+                                    message: this.$route.params.id? '修改成功!': '添加成功!',
+                                    type: 'success'
+                                });
+                                //关闭上传按钮loading
+                                that.submit_loading= false;
+                                if(that.$route.params.id){
+                                    //修改完重新加载数据
+                                    that.get_single_article()
+                                }
+                                else{
+                                    //添加完后清空表格内容
+                                    that.$refs[formName].resetFields();
+                                }
+                            }
+                            else{
+                                //返回提示信息
+                                that.$message({
+                                    showClose: true,
+                                    message: this.$route.params.id? '修改失败!': '添加失败!',
+                                    type: 'error'
+                                });
+                                that.submit_loading=false;
+                            }
                         })
                     } else {
-                        console.log('验证错误');
+
+                        //返回提示信息
+                        that.$message({
+                            showClose: true,
+                            message: '验证失败!',
+                            type: 'error'
+                        });
+                        //关闭上传按钮loading
+                        this.submit_loading= false;
                         return false;
                     }
                 });
@@ -349,6 +480,12 @@
             //重置表单
             reset_form(formName) {
                 this.$refs[formName].resetFields();
+            }
+        },
+        watch: {
+            //检测图片处理中间件数组,监听不了splice
+            img_arr:function (value) {
+                this.form.img= value.join(",")
             }
         }
     }
