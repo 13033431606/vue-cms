@@ -124,8 +124,6 @@
                 }).then((res) => {
                     //确认删除后更新页面数据
                     this.get_data(this.typeid,this.current_page,this.page_size);
-
-                    console.log(res)
                 });
             },
 

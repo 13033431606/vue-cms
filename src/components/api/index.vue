@@ -12,6 +12,10 @@
     const article_del= base_url+ "/article/del";//id
     const get_single_article= base_url+ "/article/get_single_article";//id
 
+    //category
+    const category_add= base_url+ "/category/add";//data
+    const category_del= base_url+ "/category/del";//id
+    const get_single_category= base_url+ "/category/get_single_category";//id
 
     //base
     const file_upload= base_url+ "/base/upload";//文件上传 file
@@ -24,6 +28,8 @@
         temp_path,formal_path,
         //article部分
         article_index,article_del,article_add,get_single_article,
+        //category
+        category_add,category_del,get_single_category,
         //base部分
         file_upload,type_tree,del_file
     }

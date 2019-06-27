@@ -49,16 +49,6 @@
                         @change="cat_change"></el-cascader>
             </el-form-item>
 
-            <!--日期-->
-            <el-form-item label="日期" prop="time">
-                <el-date-picker
-                        v-model="form.time"
-                        type="date"
-                        :value-format="time_type"
-                        placeholder="选择日期">
-                </el-date-picker>
-            </el-form-item>
-
             <!--关键词-->
             <el-form-item label="关键词" prop="keywords">
                 <el-input
@@ -91,9 +81,9 @@
                 <el-input-number v-model="form.sort" controls-position="right" @change="sort_change" :min="0" :max="9999"></el-input-number>
             </el-form-item>
 
-            <!--点击量-->
-            <el-form-item label="点击" prop="click">
-                <el-input-number v-model="form.click" controls-position="right" @change="click_change" :min="0" :max="999999"></el-input-number>
+            <!--类型(预留位置)-->
+            <el-form-item label="类别" prop="type">
+                <el-input-number v-model="form.type" controls-position="right" @change="type_change" :min="0" :max="9999"></el-input-number>
             </el-form-item>
 
             <!--状态-->
@@ -104,7 +94,7 @@
 
             <!--提交-->
             <el-form-item>
-                <el-button type="primary" :loading="submit_loading" @click="submit_form('form')">立即提交</el-button>
+                <el-button type="primary" :vloading="submit_loading" @click="submit_form('form')">立即提交</el-button>
                 <el-button @click="reset_form('form')">重置</el-button>
             </el-form-item>
         </el-form>
@@ -121,8 +111,8 @@
     const formal_path=api.formal_path;
 
 
-    const article_add=api.article_add;
-    const get_single_article=api.get_single_article;
+    const category_add=api.category_add;
+    const get_single_category=api.get_single_category;
 
     const file_upload=api.file_upload;
     const del_file=api.del_file;
@@ -137,9 +127,8 @@
         },
         created(){
             this.type_tree(1);
-            this.getNowFormatDate();
             if(this.$route.params.id){
-                this.get_single_article();
+                this.get_single_category();
             }
         },
         data() {
@@ -153,13 +142,13 @@
                     title: '',
                     img:'',//和img_arr,img_list,三者相关联
                     pid:[],
-                    time:'',
                     keywords: '',
                     description: '',
                     content: '',
                     sort:0,
                     state:'on',
-                    click:0,
+                    type:0,
+                    code:"0",
                     //如果是编辑的话,会有id值
                     id:this.$route.params.id?this.$route.params.id:0,
                 },
@@ -170,9 +159,6 @@
                     ],
                     pid: [
                         { required: true, message: '请选择文章分类', trigger: 'blur' }
-                    ],
-                    time: [
-                        { required: true, message: '请选择日期', trigger: 'blur' }
                     ]
                 },
                 //上传组件
@@ -185,8 +171,6 @@
                 file_upload:file_upload,
                 //分类数据
                 options:[],
-                //日期格式
-                time_type:'yyyy-MM-dd',
                 //富文本编辑器
                 all_option:{
                     selector: '#content',
@@ -302,10 +286,10 @@
         },
         methods: {
             //判断有无传值,有的话获取数据
-            get_single_article(){
+            get_single_category(){
                 this.form_loading= true;
                 this.$axios({
-                    url: get_single_article,
+                    url: get_single_category,
                     method: "get",
                     params: {id: this.$route.params.id}
                 }).then((res) => {
@@ -317,7 +301,6 @@
                     this.form= res.data.data;
                     this.form.pid= pid_arr;
 
-                    console.log(pid_arr)
                     //处理图片列表
                     //首先判断不为空
                     if(res.data.data.img != ''){
@@ -338,19 +321,8 @@
                   params:{id:id}
               }).then(res=>{
                   this.tree_loading=false;
-                  this.options=res.data.data[0]["son"];
+                  this.options=res.data.data;
               })
-            },
-
-            //获取当前时间
-            getNowFormatDate() {
-                var date = new Date();
-                var seperator1 = "-";
-                var seperator2 = ":";
-                var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
-                var strDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-                var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate;
-                this.form.time=currentdate;
             },
 
             //上传组件方法群
@@ -399,8 +371,8 @@
 
             //分类pid
             cat_change(value) {
-                //eleme联级组件返回的是数组,方便维护,取单一父id传值
-                this.form.pid= value;
+                //eleme联级组件返回的是数组
+                this.form.pid= value
             },
 
             //排序sort
@@ -409,8 +381,8 @@
             },
 
             //点击量click
-            click_change(value){
-                this.form.click= value;
+            type_change(value){
+                this.form.type= value;
             },
 
             //提交表单
@@ -425,12 +397,12 @@
                         //因为用post传值,得用qs序列化,并添加header
                         //更改pid的数据类型
                         this.form.pid= this.form.pid[this.form.pid.length-1];
-
+                       console.log(this.form)
                         that.$axios({
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             },
-                            url: article_add,
+                            url: category_add,
                             method: 'post',
                             data: qs.stringify(that.form)
                         }).then(res=>{
@@ -446,7 +418,7 @@
                                 that.submit_loading= false;
                                 if(that.$route.params.id){
                                     //修改完重新加载数据
-                                    that.get_single_article()
+                                    that.get_single_category();
                                 }
                                 else{
                                     //添加完后清空表格内容
@@ -493,7 +465,7 @@
             },
             $route(to,from){
                 //判断是否是从编辑页调至添加页
-                if(this.$route.name == "article_add"){
+                if(this.$route.name == "category_add"){
                     this.id=0;
                     this.$refs["form"].resetFields();
                     this.img_list=[];
