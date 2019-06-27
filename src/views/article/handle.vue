@@ -97,9 +97,12 @@
             </el-form-item>
 
             <!--状态-->
-            <el-form-item label="状态" prop="state">
-                <el-radio v-model="form.state" label="on">显示</el-radio>
-                <el-radio v-model="form.state" label="off">隐藏</el-radio>
+            <el-form-item label="显示" prop="state">
+                <el-switch
+                        active-value="on"
+                        inactive-value="off"
+                        v-model="form.state">
+                </el-switch>
             </el-form-item>
 
             <!--提交-->
@@ -130,7 +133,6 @@
     const type_tree=api.type_tree;
 
 
-
     export default {
         components:{
           "editor":()=>import("@tinymce/tinymce-vue"),
@@ -158,7 +160,7 @@
                     description: '',
                     content: '',
                     sort:0,
-                    state:'on',
+                    state:true,
                     click:0,
                     //如果是编辑的话,会有id值
                     id:this.$route.params.id?this.$route.params.id:0,

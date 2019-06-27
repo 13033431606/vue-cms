@@ -31,6 +31,7 @@
                     width="70">
             </el-table-column>
             <el-table-column
+                    sortable
                     label="添加时间"
                     prop="time"
                     width="100">
@@ -84,6 +85,8 @@
                 loading:true,
                 //删除的id
                 delete_id:"",
+                //文章的状态
+                state:true
             }
         },
         created(){

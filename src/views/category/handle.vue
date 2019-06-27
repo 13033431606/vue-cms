@@ -88,8 +88,11 @@
 
             <!--状态-->
             <el-form-item label="状态" prop="state">
-                <el-radio v-model="form.state" label="on">显示</el-radio>
-                <el-radio v-model="form.state" label="off">隐藏</el-radio>
+                <el-switch
+                        active-value="on"
+                        inactive-value="off"
+                        v-model="form.state">
+                </el-switch>
             </el-form-item>
 
             <!--提交-->
