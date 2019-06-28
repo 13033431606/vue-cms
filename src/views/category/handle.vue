@@ -1,105 +1,109 @@
 <template>
-    <div class="article_edit inner_container">
-        <el-form ref="form" :model="form" :rules="rules" label-width="80px" v-loading="form_loading">
-            <!--标题-->
-            <el-form-item label="标题" prop="title">
-                <el-input
-                        type="text"
-                        placeholder="请输入内容..."
-                        v-model="form.title"
-                        maxlength="200"
-                        show-word-limit
-                ></el-input>
-            </el-form-item>
+    <div class="article_edit">
+        <el-form class="article_edit_form" ref="form" :model="form" :rules="rules" label-width="80px" v-loading="form_loading">
+            <div class="left_wrapper inner_container">
+                <!--标题-->
+                <el-form-item label="标题" prop="title">
+                    <el-input
+                            type="text"
+                            placeholder="请输入内容..."
+                            v-model="form.title"
+                            maxlength="200"
+                            show-word-limit
+                    ></el-input>
+                </el-form-item>
 
-            <!--上传-->
-            <el-form-item label="图片" prop="img">
-                <el-upload
-                        :action="file_upload"
-                        list-type="picture-card"
-                        :on-preview="upload_preview"
-                        :on-remove="upload_remove"
-                        :on-success="upload_success"
-                        :limit="6"
-                        :on-exceed="upload_exceed"
-                        :file-list="img_list"
-                >
-                    <i class="el-icon-plus"></i>
-                </el-upload>
-                <el-dialog :visible.sync="dialog_visible">
-                    <img width="100%" :src="dialog_imageurl" alt="Theory by thy">
-                </el-dialog>
-            </el-form-item>
+                <!--上传-->
+                <el-form-item label="图片" prop="img">
+                    <el-upload
+                            :action="file_upload"
+                            list-type="picture-card"
+                            :on-preview="upload_preview"
+                            :on-remove="upload_remove"
+                            :on-success="upload_success"
+                            :limit="6"
+                            :on-exceed="upload_exceed"
+                            :file-list="img_list"
+                    >
+                        <i class="el-icon-plus"></i>
+                    </el-upload>
+                    <el-dialog :visible.sync="dialog_visible">
+                        <img width="100%" :src="dialog_imageurl" alt="Theory by thy">
+                    </el-dialog>
+                </el-form-item>
 
-            <!--分类-->
-            <el-form-item label="分类" prop="pid">
-                <el-cascader
-                        :show-all-levels="false"
-                        placeholder="请选择文章分类"
-                        v-model="form.pid"
-                        :options="options"
-                        v-loading="tree_loading"
-                        :props="{
+                <!--分类-->
+                <el-form-item label="分类" prop="pid">
+                    <el-cascader
+                            :show-all-levels="false"
+                            placeholder="请选择文章分类"
+                            v-model="form.pid"
+                            :options="options"
+                            v-loading="tree_loading"
+                            :props="{
                             expandTrigger: 'hover' ,
                             label: 'title',
                             value: 'id',
                             children: 'son',
                             checkStrictly: true
                         }"
-                        @change="cat_change"></el-cascader>
-            </el-form-item>
+                            @change="cat_change"></el-cascader>
+                </el-form-item>
 
-            <!--关键词-->
-            <el-form-item label="关键词" prop="keywords">
-                <el-input
-                        type="text"
-                        placeholder="请输入内容..."
-                        v-model="form.keywords"
-                        maxlength="150"
-                        show-word-limit
-                ></el-input>
-            </el-form-item>
+                <!--关键词-->
+                <el-form-item label="关键词" prop="keywords">
+                    <el-input
+                            type="text"
+                            placeholder="请输入内容..."
+                            v-model="form.keywords"
+                            maxlength="150"
+                            show-word-limit
+                    ></el-input>
+                </el-form-item>
 
-            <!--描述-->
-            <el-form-item label="描述" prop="description">
-                <el-input
-                        type="text"
-                        placeholder="请输入内容..."
-                        v-model="form.description"
-                        maxlength="350"
-                        show-word-limit
-                ></el-input>
-            </el-form-item>
+                <!--描述-->
+                <el-form-item label="描述" prop="description">
+                    <el-input
+                            type="textarea"
+                            :autosize="{ minRows: 3}"
+                            placeholder="请输入内容..."
+                            maxlength="350"
+                            show-word-limit
+                            v-model="form.description">
+                    </el-input>
+                </el-form-item>
 
-            <!--内容-->
-            <el-form-item label="内容" prop="content">
-                <editor api-key="w2tyn2nq7v7yo8gq1qx7rs8pif7w1tbck1ff2y5nb7fv6l59" v-model="form.content" :init="all_option"></editor>
-            </el-form-item>
+                <!--内容-->
+                <el-form-item label="内容" prop="content">
+                    <editor api-key="w2tyn2nq7v7yo8gq1qx7rs8pif7w1tbck1ff2y5nb7fv6l59" v-model="form.content" :init="all_option"></editor>
+                </el-form-item>
+            </div>
+            <div class="right_wrapper inner_container">
+                <!--排序-->
+                <el-form-item label="排序" prop="sort">
+                    <el-input-number v-model="form.sort" controls-position="right" @change="sort_change" :min="0" :max="9999"></el-input-number>
+                </el-form-item>
 
-            <!--排序-->
-            <el-form-item label="排序" prop="sort">
-                <el-input-number v-model="form.sort" controls-position="right" @change="sort_change" :min="0" :max="9999"></el-input-number>
-            </el-form-item>
+                <!--类型(预留位置)-->
+                <el-form-item label="类别" prop="type">
+                    <el-input-number v-model="form.type" controls-position="right" @change="type_change" :min="0" :max="9999"></el-input-number>
+                </el-form-item>
 
-            <!--类型(预留位置)-->
-            <el-form-item label="类别" prop="type">
-                <el-input-number v-model="form.type" controls-position="right" @change="type_change" :min="0" :max="9999"></el-input-number>
-            </el-form-item>
+                <!--状态-->
+                <el-form-item label="显示" prop="state">
+                    <el-switch
+                            active-value="on"
+                            inactive-value="off"
+                            v-model="form.state">
+                    </el-switch>
+                </el-form-item>
 
-            <!--状态-->
-            <el-form-item label="状态" prop="state">
-                <el-switch
-                        active-value="on"
-                        inactive-value="off"
-                        v-model="form.state">
-                </el-switch>
-            </el-form-item>
-
-            <!--提交-->
-            <el-form-item>
-                <el-button type="primary" :vloading="submit_loading" @click="submit_form('form')">立即提交</el-button>
-                <el-button @click="reset_form('form')">重置</el-button>
-            </el-form-item>
+                <!--提交-->
+                <el-form-item>
+                    <el-button type="primary" :vloading="submit_loading" @click="submit_form('form')">立即提交</el-button>
+                    <el-button @click="reset_form('form')">重置</el-button>
+                </el-form-item>
+            </div>
         </el-form>
     </div>
 
@@ -480,5 +484,19 @@
 </script>
 
 <style scoped lang="scss">
-
+    .article_edit{
+        width: 100%;
+        .article_edit_form{
+            width: 100%;
+            @include clear;
+            .left_wrapper{
+                float: left;
+                width: 70%;
+            }
+            .right_wrapper{
+                float: right;
+                width: 28%;
+            }
+        }
+    }
 </style>

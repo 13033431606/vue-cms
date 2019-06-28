@@ -10,7 +10,13 @@
         components: {
             "header_bar": () => import("@/components/header_bar"),
             "header_guide": () => import("@/components/header_guide"),
+        },
+        data(){
+            return{
+                msg:"sdasd"
+            }
         }
+
     }
 </script>
 

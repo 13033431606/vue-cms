@@ -1,6 +1,6 @@
 <template>
     <div>
-        <header_logo></header_logo>
+        <logo :style="{fontSize:26+'px'}"></logo>
         <sidebar></sidebar>
         <set_bar></set_bar>
     </div>
@@ -10,7 +10,7 @@
     export default {
         components:{
             "sidebar": () => import("@/components/sidebar"),
-            "header_logo": () => import("@/components/header_logo"),
+            "logo": () => import("@/components/logo"),
             "set_bar": () => import("@/components/set_bar"),
         }
     }

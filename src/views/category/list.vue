@@ -24,8 +24,8 @@
                 </el-button>
                 <el-button
                         size="mini"
-                        @click="category_add(node)">
-                添加
+                        @click="category_view(node)">
+                查看
               </el-button>
               <el-button
                       size="mini"
@@ -74,8 +74,8 @@
                 })
             },
             //分类操作
-            category_add(node){
-
+            category_view(node){
+                this.$router.push({ name: "article_list", params:{pid: node.data.id}});
             },
             category_edit(node){
                 this.$router.push({ name: "category_edit", params:{id: node.data.id}});

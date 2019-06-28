@@ -1,6 +1,6 @@
 <template>
     <el-menu
-            :default-active=this.$router.path
+            :default-active=this.$route.path
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
@@ -9,20 +9,26 @@
             active-text-color="#FF8C00"
             router
     >
+
+
+        <el-menu-item index="/index">
+            <i class="el-icon-house"></i>
+            <span>首页</span>
+        </el-menu-item>
         <el-submenu index="article">
             <template slot="title">
                 <i class="el-icon-document"></i>
                 <span>文章</span>
             </template>
-            <el-menu-item index="/article/index">列表</el-menu-item>
+            <el-menu-item index="/article/list">列表</el-menu-item>
             <el-menu-item index="/article/add">添加</el-menu-item>
         </el-submenu>
-        <el-submenu index="categoye">
+        <el-submenu index="category">
             <template slot="title">
-                <i class="el-icon-receiving"></i>
+                <i class="el-icon-files"></i>
                 <span>分类</span>
             </template>
-            <el-menu-item index="/category/index">列表</el-menu-item>
+            <el-menu-item index="/category/list">列表</el-menu-item>
             <el-menu-item index="/category/add">添加</el-menu-item>
         </el-submenu>
     </el-menu>

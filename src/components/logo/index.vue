@@ -1,12 +1,17 @@
 <template>
-    <div class="logo">
+    <div class="logo" :style="logo_style">
         T<span>h</span>eory
     </div>
 </template>
 
 <script>
     export default {
-        name: "index"
+        prop:['logo_style'],
+        data(){
+            return{
+                logo_style:this.logo_style
+            }
+        }
     }
 </script>
 

@@ -41,7 +41,7 @@
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
-                            @click="handle_view(scope.$index, scope.row)">查看</el-button>
+                            @click="handle_view(scope.row.id)">预览</el-button>
                     <el-button
                             size="mini"
                             @click="handle_edit(scope.row.id)">编辑</el-button>
@@ -53,6 +53,7 @@
             </el-table-column>
         </el-table>
 
+        <!--分页-->
         <div class="page">
             <el-pagination
                     @size-change="handle_size_change"
@@ -64,6 +65,24 @@
                     :total="total_count">
             </el-pagination>
         </div>
+
+        <!--预览-->
+        <el-dialog class="preview_dialog" :title="preview_data.title" :visible.sync="dialog_visible">
+            <div id="preview_article" v-loading="preview_loading">
+                <el-divider v-if="preview_data.img" content-position="left">缩略图</el-divider>
+                <el-carousel trigger="click" height="150px" v-if="preview_data.img" class="preview_banner">
+                    <el-carousel-item v-for="item in preview_data.img.split(',')" :key="item">
+                        <img class="need_contain" :src="formal_path+item" alt="">
+                    </el-carousel-item>
+                </el-carousel>
+                <el-divider v-if="preview_data.keywords" content-position="left">关键词</el-divider>
+                <div class="keywords">{{preview_data.keywords}}</div>
+                <el-divider v-if="preview_data.description" content-position="left">描述</el-divider>
+                <div class="description">{{preview_data.description}}</div>
+                <el-divider v-if="preview_data.content" content-position="left">内容</el-divider>
+                <div class="content" v-html="preview_data.content"></div>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -72,6 +91,8 @@
 
     const article_index=api.article_index;
     const article_del=api.article_del;
+    const get_single_article=api.get_single_article;
+    const formal_path=api.formal_path;
 
     export default {
         data() {
@@ -80,13 +101,21 @@
                 search: '',
                 page_size:10,
                 current_page:1,
-                typeid:0,
+                typeid:this.$route.params.pid?this.$route.params.pid:0,
                 total_count:0,
                 loading:true,
                 //删除的id
                 delete_id:"",
                 //文章的状态
-                state:true
+                state:true,
+                //预览文章的loading
+                preview_loading: true,
+                //预览文章的开关
+                dialog_visible: false,
+                //预览文章的数据
+                preview_data:{},
+                //正式资源路径
+                formal_path:formal_path
             }
         },
         created(){
@@ -131,7 +160,17 @@
             },
 
             //表单操作事件
-            handle_view(index, row) {
+            handle_view(id) {
+                this.preview_loading= false;
+                this.dialog_visible= true;
+                this.$axios({
+                    url:get_single_article,
+                    params:{id: id},
+                    method:"get"
+                }).then((res) => {
+                    this.preview_data= res.data.data;
+                    console.log(res.data.data);
+                })
 
             },
             handle_edit(id) {
@@ -202,8 +241,30 @@
     }
 </script>
 
+<style lang="scss">
+    #preview_article{
+        code{
+            white-space: pre-wrap;
+        }
+        img{
+            max-width: 100%!important;
+        }
+        table{
+            max-width: 100%!important;
+        }
+    }
+</style>
 <style scoped lang="scss">
     .page{
         padding-top: 20px;
+    }
+    .preview_dialog{
+        #preview_article{
+            width: 100%;
+            min-height: 300px;
+            .preview_banner{
+                overflow: hidden;
+            }
+        }
     }
 </style>
