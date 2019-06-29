@@ -8,7 +8,11 @@
                 TodoList
             </div>
             <div class="todo_input">
-                <input type="text" v-model="todo_input" @keyup.enter="add_todo" placeholder="请输入待做内容">
+            <el-input type="text" class="ele_input" v-model="todo_input"
+                      @keyup.enter.native="add_todo" maxlength="100"
+                      show-word-limit placeholder="请输入待做内容">
+                <i class="el-icon-edit el-input__icon" slot="suffix"></i>
+            </el-input>
             </div>
             <div class="todo_wrapper need_scroll_small">
                 <div class="tips" v-show="todo_list.length == 0">
@@ -206,21 +210,9 @@
                 padding-top: 45px;
                 margin-bottom: 20px;
                 @include input(14px,#999);
-                input{
+                .ele_input{
                     width: 90%;
-                    height: 40px;
                     margin-left: 5%;
-                    @include box-sizing();
-                    padding-left: 8px;
-                    padding-right: 8px;
-                    line-height: 40px;
-                    @include font(14px,#666);
-                    border: 1px solid #DCDFE6;
-                    border-radius: 4px;
-                    @include transition(0.5s);
-                    &:focus{
-                        border-color: $color;
-                    }
                 }
             }
             .todo_wrapper{
@@ -247,6 +239,7 @@
                     padding-right: 30px;
                     position: relative;
                     @include transition(0.5s);
+                    word-break: break-all;
                     &:hover{
                         border-color: $logo_color;
                         .sign,.close{

@@ -1,6 +1,6 @@
 <template>
     <div class="article_index inner_container">
-        <el-button plain @click="delete_selections">删除选中</el-button>
+        <el-button plain @click="delete_selections" size="medium" icon="el-icon-delete">删除选中</el-button>
         <el-table
                 :data="article_data"
                 @selection-change="handle_selection_change"
@@ -41,13 +41,16 @@
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
+                            icon=" el-icon-view"
                             @click="handle_view(scope.row.id)">预览</el-button>
                     <el-button
                             size="mini"
+                            icon="el-icon-edit"
                             @click="handle_edit(scope.row.id)">编辑</el-button>
                     <el-button
                             size="mini"
                             type="danger"
+                            icon="el-icon-delete"
                             @click="handle_delete(scope.row.id)">删除</el-button>
                 </template>
             </el-table-column>

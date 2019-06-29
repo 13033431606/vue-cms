@@ -8,6 +8,7 @@ Vue.use(VueRouter);
 import layout from '@/layout'
 
 export const default_router= [
+    { path: "", component:layout, redirect: "index"},
     { path: "/login", component:() => import("@/views/login/login"), name: "login", meta:{title: "登录"}},
     { path: "/index", component: layout, name: "index", meta: {title: "首页"},
         children: [

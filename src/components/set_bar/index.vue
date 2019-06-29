@@ -12,7 +12,7 @@
             </div>
             <div class="set_ele">
                 <el-tooltip class="item" effect="dark" content="清空缓存" placement="top">
-                    <i class="el-icon-delete" @click="handle_clear_temp"></i>
+                    <i class="el-icon-folder-delete" @click="handle_clear_temp"></i>
                 </el-tooltip>
             </div>
             <div class="set_ele">

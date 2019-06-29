@@ -9,14 +9,12 @@
             </div>
             <el-form ref="login_form" :rules="rules" :model="form" label-width="0px">
                 <el-form-item label-width="0" prop="username">
-                    <input class="login_input" type="text" v-model="form.username" placeholder="输入用户名">
+                    <input class="login_input" type="text"  v-model="form.username" placeholder="输入用户名">
                 </el-form-item>
                 <el-form-item label-width="0" prop="password">
-                    <input class="login_input" type="password" v-model="form.password" placeholder="输入密码">
+                    <input class="login_input"  type="password" v-model="form.password" placeholder="输入密码">
                 </el-form-item>
-                <el-form-item label-width="0" >
-                    <button class="login_button" @click="on_submit">登录</button>
-                </el-form-item>
+                <button class="login_button" type="button" @click="on_submit">登录</button>
             </el-form>
         </div>
         <div class="taps">
@@ -29,7 +27,6 @@
     import qs from "qs";
     import api from "@/components/api"
     const user_login=api.user_login;
-
 
     export default {
         components:{
@@ -80,7 +77,9 @@
                                 //更新store
                                 this.$store.commit("update_user");
                                 //跳转至后台首页
-                                this.$router.push({name: "index"})
+                                this.$router.push({name: "index"});
+
+                                console.log(res)
                             }else{
                                 this.$message({
                                     type:"error",

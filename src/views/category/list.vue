@@ -1,6 +1,6 @@
 <template>
     <div class="inner_container">
-        <el-button plain @click="delete_selections">删除选中</el-button>
+        <el-button plain @click="delete_selections" size="medium" icon="el-icon-delete">删除选中</el-button>
         <el-tree
                 :data="tree"
                 node-key="id"
@@ -24,17 +24,20 @@
                 </el-button>
                 <el-button
                         size="mini"
+                        icon=" el-icon-view"
                         @click="category_view(node)">
                 查看
               </el-button>
               <el-button
                       size="mini"
+                      icon="el-icon-edit"
                       @click="category_edit(node)">
                 编辑
               </el-button>
               <el-button
                       size="mini"
                       type="danger"
+                      icon="el-icon-delete"
                       @click="category_del(node)">
                 删除
               </el-button>
