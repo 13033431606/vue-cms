@@ -2,8 +2,8 @@
     <div class="header_guide">
         <div class="crumb">
             <span v-for="item in this.$route.matched">
-            {{item.meta.title}} /
-        </span>
+                    {{item.meta.title}} /
+            </span>
         </div>
     </div>
 </template>
@@ -13,7 +13,7 @@
         created(){
 
         },
-        methods:{}
+        methods:{},
     }
 </script>
 
@@ -33,6 +33,7 @@
                 color: #333;
                 font-size: 17px;
                 font-weight: lighter;
+                display: inline-block;
                 &:first-child{
                     font-size: 23px;
                 }

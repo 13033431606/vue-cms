@@ -304,20 +304,35 @@ html{
 }
 
 /*动画区域*/
-.fade-enter{
-  @include X(50%);
+.fade_y-enter{
+  @include Y(50px);
   opacity: 0;
 }
-.fade-enter-active{
+.fade_y-enter-active{
   @include transition(0.5s);
 }
 
-.fade-leave-active{
+.fade_y-leave-active{
   @include transition(0.5s);
 }
-.fade-leave-to{
+.fade_y-leave-to{
   @include Y(50px);
   opacity: 0;
 }
 
+.fade_x-enter{
+  @include X(50px);
+  opacity: 0;
+}
+.fade_x-enter-active{
+  @include transition(0.5s);
+}
+
+.fade_x-leave-active{
+  @include transition(0.5s);
+}
+.fade_x-leave-to{
+  @include X(50px);
+  opacity: 0;
+}
 

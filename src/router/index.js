@@ -1,14 +1,17 @@
 import Vue from "vue";
 import VueRouter from 'vue-router';
+import store from "@/store";
+import Cookie from 'js-cookie';
 
 Vue.use(VueRouter);
 
 import layout from '@/layout'
 
 export const default_router= [
-    { path: "/", component: layout, redirect: "/index", name: "index", meta: {title: "首页"},
+    { path: "/login", component:() => import("@/views/login/login"), name: "login", meta:{title: "登录"}},
+    { path: "/index", component: layout, name: "index", meta: {title: "首页"},
         children: [
-            { path: "index", component:() => import("@/views/index"), name:"index" ,meta: {title: "图表"}}
+            { path: "", component:() => import("@/views/index"), name:"index" ,meta: {title: "信息"}}
         ]
     },
     { path: "/article", component: layout, redirect: "/article/list", name: "article_list", meta: {title: "文章"},
@@ -24,12 +27,28 @@ export const default_router= [
             { path: "edit", component: () => import("@/views/category/handle"), name: "category_edit", meta: {title: "编辑分类"}},
             { path: "add", component: () => import("@/views/category/handle"), name: "category_add", meta: {title: "添加分类"}}
         ]
-
     }
 ];
 
+
+
 const router = new VueRouter({
-    routes:default_router
+    routes:default_router,
+
+});
+
+router.beforeEach((to, from, next) => {
+    if(to.name == "login"){
+        next()
+    }
+    else{
+        if(Cookie.get('theory_user')){
+            next();
+        }
+        else{
+            next({path:"/login"});
+        }
+    }
 });
 
 export default router;

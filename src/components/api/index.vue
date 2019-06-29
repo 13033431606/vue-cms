@@ -16,6 +16,9 @@
     const category_del= base_url+ "/category/del";//id
     const get_single_category= base_url+ "/category/get_single_category";//id
 
+    //user
+    const user_login= base_url+ "/user/user_login";//用户注册
+
     //base
     const file_upload= base_url+ "/base/upload";//文件上传 file
     const del_file= base_url+ "/base/del_file";//文件删除 file_name
@@ -25,6 +28,8 @@
     const type_tree_echarts= base_url+ "/base/type_tree_echarts";//获取echarts类型的数据
 
 
+
+
     export default {
         //public
         temp_path,formal_path,
@@ -32,6 +37,8 @@
         article_index,article_del,article_add,get_single_article,
         //category
         category_add,category_del,get_single_category,
+        //user
+        user_login,
         //base部分
         file_upload,type_tree,del_file,get_temp_size,temp_clear,type_tree_echarts
     }

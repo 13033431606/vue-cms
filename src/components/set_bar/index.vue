@@ -3,7 +3,6 @@
         <div class="progress">
             <div class="progress_data">缓存 : {{temp_size}} / 100 (mb)</div>
             <el-progress :percentage="percentage" :show-text="false" :stroke-width="3" class="progress_bar"></el-progress>
-
         </div>
         <div class="buttons">
             <div class="set_ele">
@@ -18,7 +17,7 @@
             </div>
             <div class="set_ele">
                 <el-tooltip class="item" effect="dark" content="退出登录" placement="top">
-                    <i class="el-icon-switch-button"></i>
+                    <i class="el-icon-switch-button" @click="login_out"></i>
                 </el-tooltip>
             </div>
         </div>
@@ -88,6 +87,20 @@
             //点击刷新
             handle_refresh(){
                 location.reload();
+            },
+            //退出登录
+            login_out(){
+                //清除cookie
+                this.$cookie.remove("theory_user");
+                //清除user_state状态
+                this.$store.commit("clear_state");
+                //提示信息
+                this.$notify({
+                    type:"success",
+                    message:"退出成功!",
+                });
+                //转至login页面
+                this.$router.push({name: "login"})
             }
         },
         computed:{

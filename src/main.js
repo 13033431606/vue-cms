@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import App from './App.vue';
-
+import store from "@/store";
+import Cookie from 'js-cookie';
 import Axios from 'axios';
+
 
 //element-ui
 import ElementUi from "element-ui";
@@ -17,9 +19,13 @@ import router from "./router"
 Vue.config.productionTip = false;
 
 Vue.prototype.$axios=Axios;
+Vue.prototype.$cookie=Cookie;
 
 
 new Vue({
   render: h => h(App),
-    router:router
-}).$mount('#app')
+    router,
+    store
+}).$mount('#app');
+
+

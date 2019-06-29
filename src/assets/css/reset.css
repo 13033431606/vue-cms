@@ -82,7 +82,7 @@ html{line-height:1.15;-webkit-text-size-adjust:100%;}body{margin:0}h1{font-size:
 }
 .need_scroll{
     overflow: hidden;
-    overflow-y: auto;
+    overflow-y: auto!important;
     -webkit-overflow-scrolling : touch;
 }
 .need_scroll::-webkit-scrollbar {
@@ -119,7 +119,7 @@ html{line-height:1.15;-webkit-text-size-adjust:100%;}body{margin:0}h1{font-size:
 }
 .need_scroll_small{
     overflow: hidden;
-    overflow-y: auto;
+    overflow-y: auto!important;
     -webkit-overflow-scrolling : touch;
 }
 .need_scroll_small::-webkit-scrollbar {

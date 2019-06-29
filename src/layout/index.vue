@@ -64,7 +64,7 @@
     .inner_container{
         @include a;
         border-radius: 5px;
-        overflow: hidden;
+        /*overflow: hidden;*/
         background: #fff;
         box-shadow: 0 10px 20px 0px rgba(0,0,0,0.08);
         @include box-sizing();

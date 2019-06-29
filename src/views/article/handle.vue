@@ -351,9 +351,6 @@
                   this.options=res.data.data[0]["son"];
               })
             },
-            test_l(){
-                console.log(511);
-            },
 
             //获取当前时间
             getNowFormatDate() {
@@ -479,7 +476,6 @@
                             }
                         })
                     } else {
-
                         //返回提示信息
                         that.$message({
                             showClose: true,
