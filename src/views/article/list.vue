@@ -172,7 +172,6 @@
                     method:"get"
                 }).then((res) => {
                     this.preview_data= res.data.data;
-                    console.log(res.data.data);
                 })
 
             },
