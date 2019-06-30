@@ -1,7 +1,7 @@
 <template>
     <div class="warpper">
         <div class="echarts inner_container">
-            <div id="charts" v-loading="loading"></div>
+            <div id="charts" v-loading="echarts_loading"></div>
         </div>
         <div class="todo_list inner_container">
             <div class="tag">
@@ -9,27 +9,27 @@
             </div>
             <div class="todo_input">
             <el-input type="text" class="ele_input" v-model="todo_input"
-                      @keyup.enter.native="add_todo" maxlength="100"
+                      @keyup.enter.native="todo_add" maxlength="100"
                       show-word-limit placeholder="请输入待做内容">
                 <i class="el-icon-edit el-input__icon" slot="suffix"></i>
             </el-input>
             </div>
-            <div class="todo_wrapper need_scroll_small">
+            <div class="todo_wrapper need_scroll_small" v-loading="todo_loading">
                 <div class="tips" v-show="todo_list.length == 0">
                     暂无事项
                 </div>
                 <div class="todo" v-loading="item.loading" v-for="(item,index) in todo_list" :class="item.state" :key="item.id">
-                    <div class="sign" @click="finish_todo(index)"><i class="el-icon-check"></i></div>
+                    <div class="sign" @click="todo_finish(index,item.id)"><i class="el-icon-check"></i></div>
                     {{item.title}}
-                    <div class="close" @click="remove_todo(index)"><i class="el-icon-close"></i></div>
+                    <div class="close" @click="todo_remove(index,item.id)"><i class="el-icon-close"></i></div>
                 </div>
             </div>
         </div>
-        <el-timeline class="log_list inner_container need_scroll_small">
-            <el-timeline-item timestamp="2018/4/12" placement="top" v-for="item in todo_list">
+        <el-timeline class="log_list inner_container need_scroll_small" v-loading="log_loading">
+            <el-timeline-item :timestamp="item.time" placement="top" v-for="item in log_list">
                 <el-card>
                     <h4>{{ item.title }}</h4>
-                    <p>Thy 提交于 2019/6/29 20:46</p>
+                    <p>{{ item.username }} 提交于 {{ item.time }}</p>
                 </el-card>
             </el-timeline-item>
         </el-timeline>
@@ -38,6 +38,14 @@
 
 <script>
     import api from "@/components/api";
+    import qs from "qs";
+
+    const todo_add=api.todo_add;
+    const todo_index=api.todo_index;
+    const todo_edit=api.todo_edit;
+    const log_index=api.log_index;
+
+
 
     const type_tree_echarts=api.type_tree_echarts;
 
@@ -46,7 +54,7 @@
         data(){
             return{
                 id:"charts",
-                loading:true,
+                echarts_loading:true,
                 echarts_data:[],
                 echarts_text:"文章各分类占比",
                 echarts_subtext:"文章总数:",
@@ -58,23 +66,19 @@
                 color_lv5:"#333366",
                 color_lv6:"#330033",
                 //todo_list
+                todo_loading:true,
                 todo_input:'',//表单输入框
-                todo_list:[
-                    {title:"测试内容测试内容测试内容测试内测试内容测试内容测试内容测试内容测试内容容测试内容",state:"todo",id:"1" ,loading:false},
-                    {title:"测试内容",state:"todo",id:"2" ,loading:false},
-                    {title:"测试内容",state:"todo",id:"3" ,loading:false},
-                    {title:"测试内容测试内容测试内容测试内容测试内测试内容测试内容测试内容测试内容测试内容容测试内容",state:"todo",id:"4" ,loading:false},
-                    {title:"测试内容",state:"todo",id:"5" ,loading:false},
-                    {title:"测试内容",state:"todo",id:"6" ,loading:false},
-                    {title:"测试内容测试内容测试内容测试内容测试内测试内容测试内容测试内容测试内容测试内容容测试内容",state:"todo",id:"7" ,loading:false},
-                ]
+                todo_list:[],
+                //log
+                log_loading:true,
+                log_list:[]
             }
         },
         methods:{
             //获取echarts数据
             type_tree_echarts(id){
                 //开启图表loading
-                this.loading=true;
+                this.echarts_loading=true;
                 this.$axios({
                     url:type_tree_echarts,
                     params:{id :id}
@@ -127,48 +131,108 @@
                     }
                 })
                 //初始化后关闭图表loading
-                this.loading=false;
+                this.echarts_loading=false;
             },
 
             //todo_list方法
+            //获取列表数据
+            todo_index(){
+                this.todo_loading=true;
+                this.$axios({
+                    url:todo_index,
+                    method:"get"
+                }).then((res) => {
+                    this.todo_list=res.data.data.map(function (val) {
+                        val['loading']=false;
+                        return val
+                    });
+                    this.todo_loading=false;
+                })
+            },
+
             //向todo_list增加
-            add_todo: function(){
+            todo_add: function(){
+                if(this.todo_input == '') return;
                 let data={};
                 data.title=this.todo_input;
-                data.id=Math.round(Math.random()*100);
                 data.state="todo";
-                data.loading=false;
-                this.todo_list.unshift(data);
-                this.todo_input='';
+                data.user_id=this.$store.state.user.id;
+                this.$axios({
+                    url:todo_add,
+                    method:"post",
+                    data:qs.stringify(data)
+                }).then((res) => {
+                    data.loading=false;
+                    data.id=res.data.update_id;
+                    this.todo_list.unshift(data);
+                    this.todo_input='';
+                    this.$message({
+                        type:"success",
+                        message:"添加成功!"
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type:"error",
+                        message:"添加失败!"
+                    })
+                })
             },
+
             //完成事项
-            finish_todo:function (index) {
+            todo_finish:function (index,id) {
                 this.todo_list[index]["loading"]=true;
-                var that=this;
-                setTimeout(function () {
-                    that.todo_list.splice(index,1);
-                    that.$message({
+                let data={type:"finish",id:id};
+                this.$axios({
+                    url:todo_edit,
+                    method:"post",
+                    data:qs.stringify(data)
+                }).then(() => {
+                    this.todo_list.splice(index,1);
+                    this.$message({
                         type:"success",
                         message:"已完成事项!"
                     });
-                },500)
-            },
-            //废弃事项
-            remove_todo: function (index) {
-                this.todo_list[index]["loading"]=true;
-                var that=this;
-                setTimeout(function () {
-                    that.todo_list.splice(index,1);
-                    that.$message({
-                        type:"warning",
-                        message:"已删除事项!"
-                    });
-                },500)
+                });
             },
 
+            //废弃事项
+            todo_remove: function (index,id) {
+                this.todo_list[index]["loading"]=true;
+                let data={type:"remove",id:id};
+                this.$axios({
+                    url:todo_edit,
+                    method:"post",
+                    data:qs.stringify(data)
+                }).then(() => {
+                    this.todo_list.splice(index,1);
+                    this.$message({
+                        type:"warning",
+                        message:"已移除事项!"
+                    });
+                });
+            },
+            //log
+            log_index(page,num){
+                this.log_loading=true;
+                this.$axios({
+                    url:log_index,
+                    method:"get",
+                    params:{page:page,num:num}
+                }).then((res) => {
+                    this.log_list=res.data.data;
+                    this.log_loading=false;
+                })
+            }
         },
         mounted(){
             this.type_tree_echarts(1);
+            this.todo_index();
+            this.log_index(1,10);
+        },
+        watch:{
+            todo_list:function () {
+                this.log_index(1,10);
+            }
         }
     }
 </script>

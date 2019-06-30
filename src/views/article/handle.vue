@@ -126,7 +126,6 @@
     import qs from 'qs';
     import api from "@/components/api";
 
-
     const temp_path=api.temp_path;
     const formal_path=api.formal_path;
 
@@ -435,6 +434,7 @@
                         //因为用post传值,得用qs序列化,并添加header
                         //更改pid的数据类型
                         this.form.pid= this.form.pid[this.form.pid.length-1];
+                        this.form.user_id= this.$store.state.user.id;
 
                         that.$axios({
                             headers: {

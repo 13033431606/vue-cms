@@ -19,6 +19,14 @@
     //user
     const user_login= base_url+ "/user/user_login";//用户注册
 
+    //todo_list
+    const todo_index= base_url+ "/todolist/index";
+    const todo_add= base_url+ "/todolist/add";//title,state,user_id
+    const todo_edit= base_url+ "/todolist/edit";//id,type,title
+
+    //log
+    const log_index= base_url+ "/log/index";//page,num
+
     //base
     const file_upload= base_url+ "/base/upload";//文件上传 file
     const del_file= base_url+ "/base/del_file";//文件删除 file_name
@@ -39,6 +47,10 @@
         category_add,category_del,get_single_category,
         //user
         user_login,
+        //todo_list
+        todo_index,todo_add,todo_edit,
+        //log
+        log_index,
         //base部分
         file_upload,type_tree,del_file,get_temp_size,temp_clear,type_tree_echarts
     }

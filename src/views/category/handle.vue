@@ -404,6 +404,8 @@
                         //因为用post传值,得用qs序列化,并添加header
                         //更改pid的数据类型
                         this.form.pid= this.form.pid[this.form.pid.length-1];
+                        this.form.user_id= this.$store.state.user.id;
+
                        console.log(this.form)
                         that.$axios({
                             headers: {

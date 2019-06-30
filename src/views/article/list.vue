@@ -155,7 +155,7 @@
                 this.$axios({
                     url:article_del,
                     method:"get",
-                    params:{id:id}
+                    params:{id:id,user_id:this.$store.state.user.id}
                 }).then((res) => {
                     //确认删除后更新页面数据
                     this.get_data(this.typeid,this.current_page,this.page_size);

@@ -78,8 +78,6 @@
                                 this.$store.commit("update_user");
                                 //跳转至后台首页
                                 this.$router.push({name: "index"});
-
-                                console.log(res)
                             }else{
                                 this.$message({
                                     type:"error",

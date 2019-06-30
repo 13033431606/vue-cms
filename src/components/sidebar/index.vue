@@ -2,8 +2,6 @@
     <el-menu
             :default-active=this.$route.path
             class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose"
             background-color="#222"
             text-color="rgba(255,255,255,0.95)"
             active-text-color="#FF8C00"
@@ -39,14 +37,7 @@
 
 <script>
     export default {
-        methods: {
-            handleOpen(key, keyPath) {
-                console.log(key, keyPath);
-            },
-            handleClose(key, keyPath) {
-                console.log(key, keyPath);
-            }
-        }
+
     }
 </script>
 
