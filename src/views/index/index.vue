@@ -26,6 +26,9 @@
             </div>
         </div>
         <el-timeline class="log_list inner_container need_scroll_small" v-loading="log_loading">
+            <div class="tips" v-show="log_list.length == 0">
+                暂无日志
+            </div>
             <el-timeline-item :timestamp="item.time" placement="top" v-for="item in log_list">
                 <el-card>
                     <h4>{{ item.title }}</h4>
@@ -351,7 +354,13 @@
             float: left;
             margin-left: 1%;
             height: calc(100vh - 200px);
-
+            .tips{
+                width: 100%;
+                text-align: center;
+                line-height: 40px;
+                @include font(17px,#666);
+                font-weight: 300;
+            }
         }
     }
 </style>

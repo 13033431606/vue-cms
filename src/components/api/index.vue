@@ -1,5 +1,5 @@
 <script>
-    const base_url= "http://cms-api.tt/public";//目标域名
+    const base_url= "http://cms.thy-blog.com/public";//目标域名
 
     //public
     const temp_path= base_url+ "/uploads/temp/";//缓存路径
@@ -34,7 +34,6 @@
     const get_temp_size= base_url+ "/base/get_temp_size";//获取缓存目录大小
     const temp_clear= base_url+ "/base/temp_clear";//清空缓存目录
     const type_tree_echarts= base_url+ "/base/type_tree_echarts";//获取echarts类型的数据
-
 
 
 
