@@ -9,6 +9,7 @@
                 default-expand-all
                 :expand-on-click-node="false"
                 @check="get_checked"
+                v-loading="category_loading"
                 :props="{
                     label: 'title',
                     value: 'id',
@@ -57,7 +58,8 @@
         data() {
             return {
                 tree:[],
-                delete_id:''
+                delete_id:'',
+                category_loading:true
             };
         },
         created(){
@@ -65,6 +67,7 @@
         },
         methods: {
             type_tree(id){
+                this.category_loading=true;
                 let that=this;
                 this.$axios({
                     url: type_tree,
@@ -73,7 +76,7 @@
                 }).then( (res) => {
                     that.tree=res.data.data;
                     that.tree[0].disabled=true;
-
+                    this.category_loading=false;
                 })
             },
             //分类操作
